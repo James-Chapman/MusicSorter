@@ -75,16 +75,17 @@ class MP3MusicSorter(object):
             self.log.logMsg('error', "processing: %s - %s" % (str(musicfile), str(e)))
         song = MusicTrack()
         song.filename = musicfile
-        song = self.extractBasicInfo(song, mp3_audio_file)
-        song = self.extractArtist(song, mp3_audio_file)
-        song = self.extractAlbum(song, mp3_audio_file)
-        song = self.extractTitle(song, mp3_audio_file)
-        song = self.extractTrackNumber(song, mp3_audio_file)
-        song = self.extractYear(song, mp3_audio_file)
+        song = self._extractBasicInfo(song, mp3_audio_file)
+        song = self._extractArtist(song, mp3_audio_file)
+        song = self._extractAlbum(song, mp3_audio_file)
+        song = self._extractTitle(song, mp3_audio_file)
+        song = self._extractTrackNumber(song, mp3_audio_file)
+        song = self._extractYear(song, mp3_audio_file)
+        song = self._extractMusicBrainzData(song, mp3_audio_file)
         return song
 
 
-    def extractBasicInfo(self, song, mp3_audio_file):
+    def _extractBasicInfo(self, song, mp3_audio_file):
         '''
         Extract bitrate and length from audio file.
         '''
@@ -96,7 +97,7 @@ class MP3MusicSorter(object):
         return song
     
     
-    def extractArtist(self, song, mp3_audio_file):
+    def _extractArtist(self, song, mp3_audio_file):
         '''
         Extract Artist from tags.
         '''
@@ -117,7 +118,7 @@ class MP3MusicSorter(object):
         return song
         
         
-    def extractAlbum(self, song, mp3_audio_file):
+    def _extractAlbum(self, song, mp3_audio_file):
         '''
         Extract Album Name from tags.
         '''
@@ -138,7 +139,7 @@ class MP3MusicSorter(object):
         return song
         
         
-    def extractTitle(self, song, mp3_audio_file):
+    def _extractTitle(self, song, mp3_audio_file):
         '''
         Extract Track Title from tags.
         '''
@@ -164,7 +165,7 @@ class MP3MusicSorter(object):
         return song
         
         
-    def extractTrackNumber(self, song, mp3_audio_file):
+    def _extractTrackNumber(self, song, mp3_audio_file):
         '''
         Extract Track Number from tags.
         '''
@@ -190,7 +191,7 @@ class MP3MusicSorter(object):
         return song
         
         
-    def extractYear(self, song, mp3_audio_file):
+    def _extractYear(self, song, mp3_audio_file):
         '''
         Extract Release Year from tags.
         '''
@@ -209,11 +210,14 @@ class MP3MusicSorter(object):
                 year = str(mp3_audio_file.tags.getall("TYE")[0])
             except Exception as e:
                 pass
+        try:
             song.year = year.split("-")[0]
+        except:
+            self.log.logMsg('error', "Can't split year for: %s" % (str(song.filename)))    
         return song
             
         
-    def extractMusicBrainzData(self, song, mp3_audio_file):
+    def _extractMusicBrainzData(self, song, mp3_audio_file):
         '''
         Extract MusicBrainz info from tags.
         '''
