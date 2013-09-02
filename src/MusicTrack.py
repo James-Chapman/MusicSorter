@@ -22,6 +22,7 @@ class MusicTrack(object):
         self.year   = "0000"
         self.length = None
         self.bitrate = None
+        self.comment = "http://linux-101.org"
         self.music_brainz_artist_id = None
         self.music_brainz_album_id  = None
         self.music_brainz_track_id  = None
@@ -40,6 +41,7 @@ class MusicTrack(object):
         print("year:    %s" % (self.year))
         print("length:  %s" % (self.length))
         print("bitrate: %s" % (self.bitrate))
+        print("comment: %s" % (self.comment))
         print("music_brainz_artist_id: %s" % (self.music_brainz_artist_id))
         print("music_brainz_album_id: %s" % (self.music_brainz_album_id))
         print("music_brainz_track_id: %s" % (self.music_brainz_track_id))
