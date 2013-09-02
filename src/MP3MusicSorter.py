@@ -142,6 +142,7 @@ class MP3MusicSorter(object):
         '''
         Extract Track Title from tags.
         '''
+        name = None
         try:
             name = str(mp3_audio_file.tags.getall("TIT2")[0])
         except Exception as e:
@@ -167,6 +168,7 @@ class MP3MusicSorter(object):
         '''
         Extract Track Number from tags.
         '''
+        number = None
         try:
             number = str(mp3_audio_file.tags.getall("TRCK")[0])
         except Exception as e:
@@ -192,6 +194,7 @@ class MP3MusicSorter(object):
         '''
         Extract Release Year from tags.
         '''
+        year = "0000"
         try:
             year = str(mp3_audio_file.tags.getall("TDRC")[0])
         except Exception as e:
