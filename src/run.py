@@ -70,3 +70,4 @@ if __name__ == '__main__':
     else:
         print(help_message)
     MP3MusicSorter_logger.closeLog()
+    

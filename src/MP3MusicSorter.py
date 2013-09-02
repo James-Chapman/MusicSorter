@@ -62,27 +62,6 @@ class MP3MusicSorter(object):
                         self.moveFile(music_track)
                        
                         
-    def updateTagsToV24(self, music_track):
-        '''
-        Attempts to upgrade the mp3 ID3 tags prior to the move/rename.
-        '''
-        audiofile = ID3(music_track)
-        audiofile.update_to_v24()
-        audiofile.save()
-        self.log.logMsg('debug', "Tags updated to v2.4 for %s" % (str(music_track)))
-        
-        
-        
-    def addComment(self, music_track):
-        '''
-        Add a comment to the mp3 file.
-        '''
-        audiofile = ID3(music_track)
-        audiofile.add(COMM(encoding=3, lang="eng", desc="Comment", text=u"http://linux-101.org"))
-        audiofile.save()
-        self.log.logMsg('debug', "Comment added to %s" % (str(music_track)))
-        
-
 
     def extractID3InfoFromFile(self, musicfile):
         '''
@@ -245,7 +224,26 @@ class MP3MusicSorter(object):
             self.log.logMsg('warning', "Problem extracting musicbrainz data! - %s" % (str(e)))
         return song
 
+
+    def updateTagsToV24(self, music_track):
+        '''
+        Attempts to upgrade the mp3 ID3 tags prior to the move/rename.
+        '''
+        audiofile = ID3(music_track)
+        audiofile.update_to_v24()
+        audiofile.save()
+        self.log.logMsg('debug', "Tags updated to v2.4 for %s" % (str(music_track)))
         
+        
+    def addComment(self, music_track):
+        '''
+        Add a comment to the mp3 file.
+        '''
+        audiofile = ID3(music_track)
+        audiofile.add(COMM(encoding=3, lang="eng", desc="Comment", text=u"http://linux-101.org"))
+        audiofile.save()
+        self.log.logMsg('debug', "Comment added to %s" % (str(music_track)))
+
 
     def moveFile(self, music_track):
         '''
