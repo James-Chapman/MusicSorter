@@ -10,11 +10,12 @@ To run the app do:
 
 * Modify the config file first!
 
-* python run.py pretend - This will display what it's going to do and any files it has trouble with, no
-                        files will be moved or modified.
+* python run.py pretend - This will display what it's going to do and any files it has
+                          trouble with, no files will be moved or modified.
 
-* python run.py sort_and_rename - This will rename and restructure your mp3 into the following structure:
-                        artist/album_type/(year) album_name/01 - bitrate - track_title.mp3
+* python run.py sort_and_rename - This will rename and restructure your mp3 into the 
+                          following structure:
+                          artist/album_type/(year) album_name/01 - bitrate - track_title.mp3
 
 Everything is logged to a logfile called MP3MusicSorter.log
 
