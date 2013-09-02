@@ -57,8 +57,8 @@ class MP3MusicSorter(object):
                     if pretend:
                         self.printMove(music_track)
                     if not pretend:
-                        self.updateTagsToV24(music_track)
-                        self.addComment(music_track)
+                        #self.updateTagsToV24(music_track)
+                        #self.addComment(music_track)
                         self.moveFile(music_track)
                        
                         
