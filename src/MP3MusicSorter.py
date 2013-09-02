@@ -69,20 +69,24 @@ class MP3MusicSorter(object):
         Extract ID3 information from each file.
         @return: MusicTrack object
         '''
+        mp3_audio_file = None
         try:
             mp3_audio_file = MP3(musicfile)
         except Exception as e:
-            self.log.logMsg('error', "processing: %s - %s" % (str(musicfile), str(e)))
+            self.log.logMsg('error', "fail: %s - %s" % (str(musicfile), str(e)))
         song = MusicTrack()
         song.filename = musicfile
-        song = self._extractBasicInfo(song, mp3_audio_file)
-        song = self._extractArtist(song, mp3_audio_file)
-        song = self._extractAlbum(song, mp3_audio_file)
-        song = self._extractTitle(song, mp3_audio_file)
-        song = self._extractTrackNumber(song, mp3_audio_file)
-        song = self._extractYear(song, mp3_audio_file)
-        song = self._extractMusicBrainzData(song, mp3_audio_file)
-        return song
+        try:
+            song = self._extractBasicInfo(song, mp3_audio_file)
+            song = self._extractArtist(song, mp3_audio_file)
+            song = self._extractAlbum(song, mp3_audio_file)
+            song = self._extractTitle(song, mp3_audio_file)
+            song = self._extractTrackNumber(song, mp3_audio_file)
+            song = self._extractYear(song, mp3_audio_file)
+            song = self._extractMusicBrainzData(song, mp3_audio_file)
+            return song
+        except Exception as e:
+            self.log.logMsg('error', "fail: %s - %s" % (str(musicfile), str(e)))
 
 
     def _extractBasicInfo(self, song, mp3_audio_file):
@@ -159,7 +163,7 @@ class MP3MusicSorter(object):
             except Exception as e:
                 self.log.logMsg('error', "No Title tag found for: %s" % (str(song.filename)))
         try:
-            song.name = re.sub(r'''[/{}<>%$£@:;#~*^¬]''', '_', name)
+            song.name = re.sub(r'''[/{}<>%$Â£@:;#~*^Â¬]''', '_', name)
         except Exception as e:
             self.log.logMsg('error', "No Artist tag found for: %s" % (str(song.filename)))
         return song
