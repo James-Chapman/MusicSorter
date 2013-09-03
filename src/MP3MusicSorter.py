@@ -5,17 +5,16 @@ Created on 1 Sep 2013
 
 @author: jchapman
 '''
+from MP3DataBase import MP3DataBase
 from MusicTrack import MusicTrack
-
-#from mutagen.flac import FLAC
+from mutagen.id3 import COMM, ID3
 from mutagen.mp3 import MP3
-from mutagen.id3 import ID3
-from mutagen.id3 import COMM
-
 import fnmatch
 import os
 import re
 import shutil
+
+
 
 class MP3MusicSorter(object):
     '''
@@ -34,6 +33,8 @@ class MP3MusicSorter(object):
         self.music_dir_to_scan = directory_to_scan
         self.sorted_root_dir = dest_dir
         self.log = logger
+        self.db = MP3DataBase()
+        self.db.createNewMusicTable()
         
     
     def iterateThroughFolder(self, directory_to_scan, pretend=True):
@@ -56,10 +57,14 @@ class MP3MusicSorter(object):
                 else:
                     if pretend:
                         self.printMove(music_track)
+                        self.db.insertTrack(music_track)
                     if not pretend:
                         #self.updateTagsToV24(music_track)
                         #self.addComment(music_track)
                         self.moveFile(music_track)
+                        # Update DB
+        data_base_data = self.db.getDuplicates()
+        self.db.dropMusicTable()
                        
                         
 
@@ -74,17 +79,17 @@ class MP3MusicSorter(object):
             mp3_audio_file = MP3(musicfile)
         except Exception as e:
             self.log.logMsg('error', "fail: %s - %s" % (str(musicfile), str(e)))
-        song = MusicTrack()
-        song.filename = musicfile
+        music_track = MusicTrack()
+        music_track.filename = musicfile
         try:
-            song = self._extractBasicInfo(song, mp3_audio_file)
-            song = self._extractArtist(song, mp3_audio_file)
-            song = self._extractAlbum(song, mp3_audio_file)
-            song = self._extractTitle(song, mp3_audio_file)
-            song = self._extractTrackNumber(song, mp3_audio_file)
-            song = self._extractYear(song, mp3_audio_file)
-            song = self._extractMusicBrainzData(song, mp3_audio_file)
-            return song
+            music_track = self._extractBasicInfo(music_track, mp3_audio_file)
+            music_track = self._extractArtist(music_track, mp3_audio_file)
+            music_track = self._extractAlbum(music_track, mp3_audio_file)
+            music_track = self._extractTitle(music_track, mp3_audio_file)
+            music_track = self._extractTrackNumber(music_track, mp3_audio_file)
+            music_track = self._extractYear(music_track, mp3_audio_file)
+            music_track = self._extractMusicBrainzData(music_track, mp3_audio_file)
+            return music_track
         except Exception as e:
             self.log.logMsg('error', "fail: %s - %s" % (str(musicfile), str(e)))
 
