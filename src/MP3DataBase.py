@@ -54,7 +54,7 @@ class MP3DataBase(object):
         Print out all the duplicates
         '''
         cursor = self.conn.cursor()
-        cursor.execute("SELECT artist, album, track, bitrate, COUNT(file) AS filecount FROM music GROUP BY track ORDER BY COUNT(file) ASC")
+        cursor.execute("SELECT artist, album, track, bitrate, COUNT(file) AS filecount FROM music GROUP BY track ORDER BY COUNT(file),artist,track ASC")
         results = cursor.fetchall()
         return results
     
