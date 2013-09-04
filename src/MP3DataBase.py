@@ -21,6 +21,19 @@ class MP3DataBase(object):
         self.conn = sqlite3.connect("music.db")
         
 
+    def _removeNonAscii(self, s): 
+        '''
+        Strip out non ascii characters from a string. SQLite gets unhappy if it finds chars that it can't read.
+        '''
+        return "".join(i for i in s if ord(i)<128)
+    
+    
+    def _stripBadChars(self, s):
+        '''
+        Remove chars that could break a DB query.
+        '''
+        return re.sub(r'''['<>]''', '', self._removeNonAscii(str(s)))
+
         
     def createNewMusicTable(self):
         '''
@@ -29,20 +42,16 @@ class MP3DataBase(object):
         cursor = self.conn.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS music(artist, album, track, bitrate, file)''')
         self.conn.commit()
-        
-        
-    def removeNonAscii(self, s): 
-        return "".join(i for i in s if ord(i)<128)
     
         
     def insertTrack(self, music_track=MusicTrack()):
         '''
         Insert a track into our SQLite database
         '''
-        artist   = re.sub(r'''['<>]''', '_', self.removeNonAscii(str(music_track.artist)))
-        album    = re.sub(r'''['<>]''', '_', self.removeNonAscii(str(music_track.album)))
-        track    = re.sub(r'''['<>]''', '_', self.removeNonAscii(str(music_track.name)))
-        filename = re.sub(r'''['<>]''', '_', self.removeNonAscii(str(music_track.filename)))
+        artist   = self._stripBadChars(music_track.artist)
+        album    = self._stripBadChars(music_track.album)
+        track    = self._stripBadChars(music_track.name)
+        filename = self._stripBadChars(music_track.filename)
         bitrate = music_track.bitrate
         cursor = self.conn.cursor()
         cursor.execute("INSERT INTO music VALUES ('%s','%s','%s','%s', '%s')" % (artist, album, track, bitrate, filename))
