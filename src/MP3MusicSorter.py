@@ -65,7 +65,7 @@ class MP3MusicSorter(object):
             try:
                 song.artist = mp3_audio_file.tags.getall("artist")[0]
             except Exception as e:
-                self.log.logMsg('error', "No Artist tag found for: %s" % (str(song.filename)))
+                pass
         return song
         
         
@@ -86,7 +86,7 @@ class MP3MusicSorter(object):
             try:
                 song.album = mp3_audio_file.tags.getall("album")[0]
             except Exception as e:
-                self.log.logMsg('error', "No Album tag found for: %s" % (str(song.filename)))
+                pass
         return song
         
         
@@ -108,11 +108,12 @@ class MP3MusicSorter(object):
             try:
                 name = str(mp3_audio_file.tags.getall("title")[0])
             except Exception as e:
-                self.log.logMsg('error', "No Title tag found for: %s" % (str(song.filename)))
-        try:
-            song.name = re.sub(r'''[/{}<>%$Â£@:;#~*^Â¬]''', '_', name)
-        except Exception as e:
-            self.log.logMsg('error', "No Artist tag found for: %s" % (str(song.filename)))
+                pass
+        if name:
+            try:
+                song.name = re.sub(r'''[/{}<>%$Â£@:;#~*^Â¬]''', '_', name)
+            except Exception as e:
+                pass
         return song
         
         
@@ -134,11 +135,12 @@ class MP3MusicSorter(object):
             try:
                 number = str(mp3_audio_file.tags.getall("track")[0])
             except Exception as e:
-                self.log.logMsg('error', "No Track Number tag found for: %s" % (str(song.filename)))
-        try:
-            song.number = number.split("/")[0].zfill(2)
-        except:
-            self.log.logMsg('error', "Can't split track number for: %s" % (str(song.filename)))
+                pass
+        if number:
+            try:
+                song.number = number.split("/")[0].zfill(2)
+            except:
+                self.log.logMsg('error', "Can't split track number for: %s" % (str(song.filename)))
         return song
         
         
@@ -161,10 +163,11 @@ class MP3MusicSorter(object):
                 year = str(mp3_audio_file.tags.getall("TYE")[0])
             except Exception as e:
                 pass
-        try:
-            song.year = year.split("-")[0]
-        except:
-            self.log.logMsg('error', "Can't split year for: %s" % (str(song.filename)))    
+        if year != "0000":
+            try:
+                song.year = year.split("-")[0]
+            except:
+                self.log.logMsg('error', "Can't split year for: %s" % (str(song.filename)))    
         return song
             
         
