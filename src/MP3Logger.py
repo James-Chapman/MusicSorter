@@ -45,7 +45,8 @@ class MP3Logger:
                 print("[%s] %s" % (level.upper(), message))
         if level == 'warning':
             self.logger.warning(message)
-            print("[%s] %s" % (level.upper(), message))
+            if print_it:
+                print("[%s] %s" % (level.upper(), message))
         if level == 'error':
             self.logger.error(message)
             print("[%s] %s" % (level.upper(), message))

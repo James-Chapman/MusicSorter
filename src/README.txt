@@ -10,14 +10,39 @@ To run the app do:
 
 * Modify the config file first!
 
-* python run.py pretend - This will display what it's going to do and any files it has
-                          trouble with, no files will be moved or modified.
+* run.py show_duplicates - Will print out a list of Artists and Track Titles 
+                           that have more than 1 file associated with each Title.
 
-* python run.py sort_and_rename - This will rename and restructure your mp3 into the 
-                          following structure:
-                          artist/album_type/(year) album_name/01 - bitrate - track_title.mp3
+* run.py pretend         - This will display what it's going to do if the sort_and_rename
+                           option is passed in.
+
+* run.py sort_and_rename - This will rename and restructure your mp3 into the 
+                           following structure:
+                           artist/album_type/(year) album_name/01 - bitrate - track_title.mp3
 
 Everything is logged to a logfile called MP3MusicSorter.log
+
+
+
+
+
+
+-- CHANGELOG --
+
+  4 September 2013
+
+* Added SQLite DB queries to show tracks that have more than 1 file associated with it.
+* Added MP3Exception class.
+
+
+
+  1 September 2013
+
+* Initial project creation.
+
+
+
+
 
 
 

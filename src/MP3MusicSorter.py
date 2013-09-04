@@ -9,6 +9,7 @@ from MP3DataBase import MP3DataBase
 from MusicTrack import MusicTrack
 from mutagen.id3 import COMM, ID3
 from mutagen.mp3 import MP3
+import MP3Exception
 import fnmatch
 import os
 import re
@@ -33,38 +34,47 @@ class MP3MusicSorter(object):
         self.music_dir_to_scan = directory_to_scan
         self.sorted_root_dir = dest_dir
         self.log = logger
-        self.db = MP3DataBase()
-        self.db.createNewMusicTable()
+        
         
     
-    def iterateThroughFolder(self, directory_to_scan, pretend=True):
+    def iterateThroughFolder(self, directory_to_scan, action="duplicates"):
         '''
         Iterate through folder and perform id3 query against each file.
         '''
         self.music_dir_to_scan = directory_to_scan
+        if action == "getDuplicates":
+            self.db = MP3DataBase()
+            self.db.createNewMusicTable()
         for root, dirnames, filenames in os.walk(self.music_dir_to_scan):
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 music_track = self.extractID3InfoFromFile(os.path.join(root, filename))
                 #music_track.printMusicTrackData()
                 if music_track.album == None:
-                    self.log.logMsg('error', "%s has no album." % (music_track.filename))
+                    self.log.logMsg('error', "Skipping file: %s - no album found." % (music_track.filename))
                 elif music_track.artist == None:
-                    self.log.logMsg('error', "%s has no artist." % (music_track.filename))
+                    self.log.logMsg('error', "Skipping file: %s - no artist found." % (music_track.filename))
                 elif music_track.name == None:
-                    self.log.logMsg('error', "%s has no name." % (music_track.filename))
+                    self.log.logMsg('error', "Skipping file: %s - no title found." % (music_track.filename))
                 elif music_track.number == None:
-                    self.log.logMsg('error', "%s has no track number." % (music_track.filename))
+                    self.log.logMsg('error', "Skipping file: %s - no track number found." % (music_track.filename))
                 else:
-                    if pretend:
+                    if action == "pretend":
                         self.printMove(music_track)
-                        self.db.insertTrack(music_track)
-                    if not pretend:
+                    elif action == "restructure":
                         #self.updateTagsToV24(music_track)
                         #self.addComment(music_track)
                         self.moveFile(music_track)
-                        # Update DB
-        data_base_data = self.db.getDuplicates()
-        self.db.dropMusicTable()
+                    elif action == "getDuplicates":
+                        self.db.insertTrack(music_track)
+                    else:
+                        raise MP3Exception("Unrecognised action parameter in %s.iterateThroughFolder()" % (self.this_class))
+        if action == "getDuplicates":
+            db_data = self.db.getDuplicates()
+            for row in db_data:
+                if int(row[4]) > 1:
+                    print(str(row[4]).ljust(6) + str(row[0]).ljust(40) + str(row[2]).ljust(40))
+            self.db.dropMusicTable()
+        
                        
                         
 
@@ -237,7 +247,7 @@ class MP3MusicSorter(object):
             song.music_brainz_track_id = mp3_audio_file.tags.getall("TXXX:ASIN")[0]
             song.music_brainz_album_type = mp3_audio_file.tags.getall("TXXX:MusicBrainz Album Type")[0]
         except Exception as e:
-            self.log.logMsg('warning', "Problem extracting musicbrainz data! - %s" % (str(e)))
+            self.log.logMsg('warning', "Problem extracting musicbrainz data! - %s" % (str(e)), False)
         return song
 
 

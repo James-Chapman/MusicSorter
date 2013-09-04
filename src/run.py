@@ -27,7 +27,9 @@ USAGE
 
   %s pretend - Won't actually do anything, just a pretend run.
   %s sort_and_rename - This will cause files to be sorted and renamed.
-''' % (this_script, this_script)
+  %s show_duplicates - Will print out a list of Artists and Track Titles 
+                       that have more than 1 file associated with it.
+''' % (this_script, this_script, this_script)
 
 configFile = "%s.cfg" % (name)
 if not os.path.exists(configFile):
@@ -54,20 +56,31 @@ if __name__ == '__main__':
         MP3MusicSorter_logger.closeLog()
     if arg == "pretend":
         try:
-            sorter.iterateThroughFolder(current_mp3_dir, pretend=True)
+            sorter.iterateThroughFolder(current_mp3_dir, action="pretend")
         except KeyboardInterrupt:
-            ### handle keyboard interrupt ###
             print("CTRL+C caught... Stopped!")
             MP3MusicSorter_logger.closeLog()
     elif arg == "sort_and_rename":
-        sorter.iterateThroughFolder(current_mp3_dir, pretend=False)
         try:
-            sorter.iterateThroughFolder(current_mp3_dir, pretend=True)
+            sorter.iterateThroughFolder(current_mp3_dir, action="restructure")
         except KeyboardInterrupt:
-            ### handle keyboard interrupt ###
             print("CTRL+C caught... Stopped!")
             MP3MusicSorter_logger.closeLog()
+    elif arg == "show_duplicates":
+        try:
+            sorter.iterateThroughFolder(current_mp3_dir, action="getDuplicates")
+        except KeyboardInterrupt:
+            print("CTRL+C caught... Stopped!")
+            MP3MusicSorter_logger.closeLog()        
     else:
         print(help_message)
     MP3MusicSorter_logger.closeLog()
+    
+    
+    
+    
+    
+    
+    
+    
     
