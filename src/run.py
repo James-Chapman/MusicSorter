@@ -25,11 +25,14 @@ help_message = '''
 
 USAGE
 
-  %s pretend - Won't actually do anything, just a pretend run.
-  %s sort_and_rename - This will cause files to be sorted and renamed.
-  %s show_duplicates - Will print out a list of Artists and Track Titles 
-                       that have more than 1 file associated with it.
-''' % (this_script, this_script, this_script)
+  %s show_duplicates  - Will print out a list of Artists and Track Titles 
+                        that have more than 1 file associated with it.
+  %s pretend          - Won't actually do anything, just a pretend run.
+  %s sort_and_rename  - This will cause files to be sorted and renamed.
+  %s update_tags      - Try and upgrade existing tags to ID3 version 2.4
+                        (not sure that this actually does anything!)
+  
+''' % (this_script, this_script, this_script, this_script)
 
 configFile = "%s.cfg" % (name)
 if not os.path.exists(configFile):
@@ -71,7 +74,13 @@ if __name__ == '__main__':
             sorter.iterateThroughFolder(current_mp3_dir, action="getDuplicates")
         except KeyboardInterrupt:
             print("CTRL+C caught... Stopped!")
-            MP3MusicSorter_logger.closeLog()        
+            MP3MusicSorter_logger.closeLog()
+    elif arg == "update_tags":
+        try:
+            sorter.iterateThroughFolder(current_mp3_dir, action="upgradeTags")
+        except KeyboardInterrupt:
+            print("CTRL+C caught... Stopped!")
+            MP3MusicSorter_logger.closeLog()
     else:
         print(help_message)
     MP3MusicSorter_logger.closeLog()

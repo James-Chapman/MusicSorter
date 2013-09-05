@@ -7,13 +7,15 @@ Created on 1 Sep 2013
 '''
 from MP3DataBase import MP3DataBase
 from MusicTrack import MusicTrack
-from mutagen.id3 import COMM, ID3
+from mutagen.easyid3 import EasyID3
+from mutagen.id3 import COMM, ID3, TPE2
 from mutagen.mp3 import MP3
 import MP3Exception
 import fnmatch
 import os
 import re
 import shutil
+import sys
 
 
 
@@ -34,158 +36,102 @@ class MP3MusicSorter(object):
         self.music_dir_to_scan = directory_to_scan
         self.sorted_root_dir = dest_dir
         self.log = logger
+        self.PRINT_DEBUG = False
         
         
-    def _extractBasicInfo(self, song, mp3_audio_file):
+    def _extractBitrate(self, mp3_audio_file):
         '''
         Extract bitrate and length from audio file.
         '''
-        try:
-            song.bitrate = mp3_audio_file.info.bitrate / 1000
-            song.length = mp3_audio_file.info.length
-        except Exception as e:
-            self.log.logMsg('error', "error reading file info: %s - %s" % (str(song.filename), str(e)))
-        return song
+        bitrate = mp3_audio_file.info.bitrate / 1000
+        self.log.logMsg('debug', "Bitrate: %s" % (bitrate), self.PRINT_DEBUG)
+        return bitrate
     
     
-    def _extractArtist(self, song, mp3_audio_file):
+    def _extractLength(self, mp3_audio_file):
+        '''
+        Extract bitrate and length from audio file.
+        '''
+        length = mp3_audio_file.info.length
+        self.log.logMsg('debug', "Length: %s" % (length), self.PRINT_DEBUG)
+        return length
+
+    
+    def _extractTagDataFromFile(self, tags, mp3_audio_file):
+        '''
+        Searches for tags in an MP3() file.
+        '''
+        for tag in tags:
+            retval = mp3_audio_file.tags.getall(tag)
+            if retval:
+                self.log.logMsg('debug', "Tag found: %s - %s" % (tag, retval[0]), self.PRINT_DEBUG)
+                return retval[0]
+        #print(mp3_audio_file.tags.getall("TXXX"))
+        return None
+    
+    
+    def _extractArtist(self, mp3_audio_file):
         '''
         Extract Artist from tags.
         '''
-        try:
-            song.artist = mp3_audio_file.tags.getall("TPE2")[0]
-        except Exception as e:
-            pass
-        if not song.artist:
-            try:
-                song.artist = mp3_audio_file.tags.getall("TP2")[0]
-            except Exception as e:
-                pass
-        if not song.artist:
-            try:
-                song.artist = mp3_audio_file.tags.getall("artist")[0]
-            except Exception as e:
-                pass
-        return song
+        retval = self._extractTagDataFromFile(["TPE2","TPE1","TP2","TP1"], mp3_audio_file)
+        self.log.logMsg('debug', "Artist: %s" % (retval), self.PRINT_DEBUG)
+        return retval
         
         
-    def _extractAlbum(self, song, mp3_audio_file):
+    def _extractAlbum(self, mp3_audio_file):
         '''
         Extract Album Name from tags.
         '''
-        try:
-            song.album = mp3_audio_file.tags.getall("TALB")[0]
-        except Exception as e:
-            pass
-        if not song.album:
-            try:
-                song.album = mp3_audio_file.tags.getall("TAL")[0]
-            except Exception as e:
-                pass
-        if not song.album:
-            try:
-                song.album = mp3_audio_file.tags.getall("album")[0]
-            except Exception as e:
-                pass
-        return song
+        retval = self._extractTagDataFromFile(["TALB","TAL","album"], mp3_audio_file)
+        self.log.logMsg('debug', "Album: %s" % (retval), self.PRINT_DEBUG)
+        return retval
+
         
-        
-    def _extractTitle(self, song, mp3_audio_file):
+    def _extractTitle(self, mp3_audio_file):
         '''
         Extract Track Title from tags.
         '''
-        name = None
-        try:
-            name = str(mp3_audio_file.tags.getall("TIT2")[0])
-        except Exception as e:
-            pass
-        if not name:
-            try:
-                name = str(mp3_audio_file.tags.getall("TT2")[0])
-            except Exception as e:
-                pass
-        if not name:
-            try:
-                name = str(mp3_audio_file.tags.getall("title")[0])
-            except Exception as e:
-                pass
-        if name:
-            try:
-                song.name = re.sub(r'''[/{}<>%$Â£@:;#~*^Â¬]''', '_', name)
-            except Exception as e:
-                pass
-        return song
+        retval = self._extractTagDataFromFile(["TIT2","TT2","title"], mp3_audio_file)
+        self.log.logMsg('debug', "Title: %s" % (retval), self.PRINT_DEBUG)
+        return retval
         
         
-    def _extractTrackNumber(self, song, mp3_audio_file):
+    def _extractTrackNumber(self, mp3_audio_file):
         '''
         Extract Track Number from tags.
         '''
-        number = None
-        try:
-            number = str(mp3_audio_file.tags.getall("TRCK")[0])
-        except Exception as e:
-            pass
-        if not number:
-            try:
-                number = str(mp3_audio_file.tags.getall("TRK")[0])
-            except Exception as e:
-                pass
-        if not number:
-            try:
-                number = str(mp3_audio_file.tags.getall("track")[0])
-            except Exception as e:
-                pass
-        if number:
-            try:
-                song.number = number.split("/")[0].zfill(2)
-            except:
-                self.log.logMsg('error', "Can't split track number for: %s" % (str(song.filename)))
-        return song
+        retval = self._extractTagDataFromFile(["TRCK","TRK","track"], mp3_audio_file)
+        if not retval:
+            retval = "00/00"
+        retval = str(retval).split('/')[0]
+        self.log.logMsg('debug', "Track: %s" % (retval), self.PRINT_DEBUG)
+        return retval
         
         
-    def _extractYear(self, song, mp3_audio_file):
+    def _extractYear(self, mp3_audio_file):
         '''
         Extract Release Year from tags.
         '''
-        year = "0000"
-        try:
-            year = str(mp3_audio_file.tags.getall("TDRC")[0])
-        except Exception as e:
-            pass
-        if year == "0000":
-            try:
-                year = str(mp3_audio_file.tags.getall("TYER")[0])
-            except Exception as e:
-                pass
-        if year == "0000":
-            try:
-                year = str(mp3_audio_file.tags.getall("TYE")[0])
-            except Exception as e:
-                pass
-        if year != "0000":
-            try:
-                song.year = year.split("-")[0]
-            except:
-                self.log.logMsg('error', "Can't split year for: %s" % (str(song.filename)))    
-        return song
+        retval = self._extractTagDataFromFile(["TDRC","TYER","TYE"], mp3_audio_file)
+        if not retval:
+            retval = "0000-00-00"
+        retval = str(retval).split('-')[0]
+        self.log.logMsg('debug', "Year: %s" % (retval), self.PRINT_DEBUG)
+        return retval
             
-        
-    def _extractMusicBrainzData(self, song, mp3_audio_file):
+    
+    def _extractMusicBrainzAlbumType(self, mp3_audio_file):
         '''
         Extract MusicBrainz info from tags.
         '''
-        try:
-            song.music_brainz_artist_id = mp3_audio_file.tags.getall("TXXX:ASIN")[0]
-            song.music_brainz_album_artist_id = mp3_audio_file.tags.getall("TXXX:MusicBrainz Album Artist Id")[0]
-            song.music_brainz_album_id = mp3_audio_file.tags.getall("TXXX:MusicBrainz Artist Id")[0]
-            song.music_brainz_track_id = mp3_audio_file.tags.getall("TXXX:ASIN")[0]
-            song.music_brainz_album_type = mp3_audio_file.tags.getall("TXXX:MusicBrainz Album Type")[0]
-        except Exception as e:
-            self.log.logMsg('warning', "Problem extracting musicbrainz data! - %s" % (str(e)), False)
-        return song
-        
-        
+        retval = self._extractTagDataFromFile(["TXXX:MusicBrainz Album Type"], mp3_audio_file)
+        if not retval:
+            retval = "unknown"
+        self.log.logMsg('debug', "MusicBrainz Album Type: %s" % (retval), self.PRINT_DEBUG)
+        return retval
+    
+    
     def _setupDestinationDirString(self, music_track):
         '''
         Creates file path string based off the OS argument.
@@ -207,7 +153,34 @@ class MP3MusicSorter(object):
         '''
         final_file_path = "%s%s%s - %s - %s.mp3" %(destination_dir, self.sep, music_track.number, 
                                                    music_track.bitrate, music_track.name)
+        final_file_path = self._stripBadChars(final_file_path)
         return final_file_path
+    
+    
+    def _checkForMissingInfo(self, music_track):
+        '''
+        Check music track for missing fields.
+        '''
+        anything_missing = False
+        if music_track.album == None: anything_missing = True
+        if music_track.artist == None: anything_missing = True
+        if music_track.name == None: anything_missing = True
+        if music_track.number == None: anything_missing = True
+        return anything_missing
+    
+    
+    def _removeNonAscii(self, str_in): 
+        '''
+        Strip out non ascii characters from a string. SQLite gets unhappy if it finds chars that it can't read.
+        '''
+        return "".join(char for char in str_in if ord(char)<128)
+    
+    
+    def _stripBadChars(self, str_in):
+        '''
+        Remove chars that could break a DB query.
+        '''
+        return re.sub(r'''['<>;{}~*&#|]''', '', self._removeNonAscii(str(str_in)))
     
         
     def iterateThroughFolder(self, directory_to_scan, action="duplicates"):
@@ -221,16 +194,12 @@ class MP3MusicSorter(object):
         for root, dirnames, filenames in os.walk(self.music_dir_to_scan):
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 music_track = self.extractID3InfoFromFile(os.path.join(root, filename))
-                #music_track.printMusicTrackData()
-                if music_track.album == None:
-                    self.log.logMsg('error', "Skipping file: %s - no album found." % (music_track.filename))
-                elif music_track.artist == None:
-                    self.log.logMsg('error', "Skipping file: %s - no artist found." % (music_track.filename))
-                elif music_track.name == None:
-                    self.log.logMsg('error', "Skipping file: %s - no title found." % (music_track.filename))
-                elif music_track.number == None:
-                    self.log.logMsg('error', "Skipping file: %s - no track number found." % (music_track.filename))
-                else:
+                self.addComment(music_track.filename)
+                if action == "upgradeTags":
+                    self.updateTagsToV24(music_track.filename)
+                    sys.exit()
+                missing_fields = self._checkForMissingInfo(music_track)
+                if not missing_fields:
                     if action == "pretend":
                         self.printMove(music_track)
                     elif action == "restructure":
@@ -241,6 +210,8 @@ class MP3MusicSorter(object):
                         self.db.insertTrack(music_track)
                     else:
                         raise MP3Exception("Unrecognised action parameter in %s.iterateThroughFolder()" % (self.this_class))
+                else:
+                    self.log.logMsg('error', "Skipping file because key info is missing: %s" % (music_track.filename))
         if action == "getDuplicates":
             db_data = self.db.getDuplicates()
             for row in db_data:
@@ -262,17 +233,31 @@ class MP3MusicSorter(object):
             self.log.logMsg('error', "fail: %s - %s" % (str(musicfile), str(e)))
         music_track = MusicTrack()
         music_track.filename = musicfile
+        music_track.bitrate  = self._extractBitrate(mp3_audio_file)
+        music_track.length   = self._extractLength(mp3_audio_file)
+        music_track.artist   = self._extractArtist(mp3_audio_file)
+        music_track.album    = self._extractAlbum(mp3_audio_file)
+        music_track.name     = self._extractTitle(mp3_audio_file)
+        music_track.number   = self._extractTrackNumber(mp3_audio_file)
+        music_track.year     = self._extractYear(mp3_audio_file)
+        music_track.music_brainz_album_type = self._extractMusicBrainzAlbumType(mp3_audio_file)
+        return music_track
+
+            
+    def extractAllTagData(self, musicfile):
+        '''
+        Extract MusicBrainz info from tags.
+        '''
+        #mp3_audio_file = None
         try:
-            music_track = self._extractBasicInfo(music_track, mp3_audio_file)
-            music_track = self._extractArtist(music_track, mp3_audio_file)
-            music_track = self._extractAlbum(music_track, mp3_audio_file)
-            music_track = self._extractTitle(music_track, mp3_audio_file)
-            music_track = self._extractTrackNumber(music_track, mp3_audio_file)
-            music_track = self._extractYear(music_track, mp3_audio_file)
-            music_track = self._extractMusicBrainzData(music_track, mp3_audio_file)
-            return music_track
+            mp3_audio_file = MP3(musicfile)
+            print(mp3_audio_file)
+            easymp3_audio_file = EasyID3(musicfile)
+            print(easymp3_audio_file)
         except Exception as e:
             self.log.logMsg('error', "fail: %s - %s" % (str(musicfile), str(e)))
+        #tag_data = mp3_audio_file.tags.getall("")
+        #return tag_data
 
 
     def updateTagsToV24(self, music_track):
@@ -282,19 +267,29 @@ class MP3MusicSorter(object):
         audiofile = ID3(music_track)
         audiofile.update_to_v24()
         audiofile.save()
-        self.log.logMsg('debug', "Tags updated to v2.4 for %s" % (str(music_track)))
+        self.log.logMsg('info', "Tags updated to v2.4 for %s" % (str(music_track)), True)
         
         
-    def addComment(self, music_track):
+    def addComment(self, music_file):
         '''
         Add a comment to the mp3 file.
         '''
-        audiofile = ID3(music_track)
-        audiofile.add(COMM(encoding=3, lang="eng", desc="Comment", text=u"http://linux-101.org"))
+        audiofile = ID3(music_file)
+        audiofile.add(COMM(encoding=3, lang="eng", desc="Comment", text=u"MP3MusicSorter"))
         audiofile.save()
-        self.log.logMsg('debug', "Comment added to %s" % (str(music_track)))
-
-
+        self.log.logMsg('debug', "Comment added to %s" % (str(music_file)), self.PRINT_DEBUG)
+        
+        
+    def newArtistTag(self, music_file, artist_string):
+        '''
+        Add a new artist tag to the mp3 file.
+        '''
+        audiofile = ID3(music_file)
+        audiofile.add(TPE2(encoding=3, text=u"%s" % (artist_string)))
+        audiofile.save()
+        self.log.logMsg('debug', "Artist tag added to %s" % (str(music_file)), self.PRINT_DEBUG)
+        
+        
     def moveFile(self, music_track):
         '''
         Moves the file to new destination based off information in the tag info

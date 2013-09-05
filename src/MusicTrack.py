@@ -28,6 +28,7 @@ class MusicTrack(object):
         self.music_brainz_track_id  = None
         self.music_brainz_album_artist_id = None
         self.music_brainz_album_type = "unknown"
+        self.allTagData = None
         
          
     def printMusicTrackData(self):
