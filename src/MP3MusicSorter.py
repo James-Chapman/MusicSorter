@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 1 Sep 2013
-
-@author: jchapman
 '''
+
 from MP3DataBase import MP3DataBase
 from MusicTrack import MusicTrack
 from mutagen.easyid3 import EasyID3
@@ -16,8 +15,6 @@ import os
 import re
 import shutil
 import sys
-
-
 
 class MP3MusicSorter(object):
     '''
@@ -104,7 +101,7 @@ class MP3MusicSorter(object):
         retval = self._extractTagDataFromFile(["TRCK","TRK","track"], mp3_audio_file)
         if not retval:
             retval = "00/00"
-        retval = str(retval).split('/')[0]
+        retval = str(retval).split('/')[0].zfill(2)
         self.log.logMsg('debug', "Track: %s" % (retval), self.PRINT_DEBUG)
         return retval
         
@@ -138,9 +135,11 @@ class MP3MusicSorter(object):
         @param music_track:  
         @return: destination_dir is the OS correct destination dir path
         '''
-        destination_dir = "%s%s%s%s%s%s(%s) %s" % (self.sorted_root_dir, self.sep, music_track.artist, 
-                                                   self.sep, music_track.music_brainz_album_type, 
-                                                   self.sep, music_track.year, music_track.album)
+        destination_dir = "%s%s%s%s%s%s(%s) %s" % (self.sorted_root_dir, self.sep,
+                                                   self._subBadChars(str(music_track.artist)), self.sep, 
+                                                   music_track.music_brainz_album_type, self.sep,
+                                                   music_track.year, self._stripBadChars(str(music_track.album)))
+        self.log.logMsg('debug', "Destination dir: %s" % (destination_dir), self.PRINT_DEBUG)
         return destination_dir
         
 
@@ -152,8 +151,8 @@ class MP3MusicSorter(object):
         @return: final_file_path is the OS correct file path
         '''
         final_file_path = "%s%s%s - %s - %s.mp3" %(destination_dir, self.sep, music_track.number, 
-                                                   music_track.bitrate, music_track.name)
-        final_file_path = self._stripBadChars(final_file_path)
+                                                   music_track.bitrate, self._subBadChars(str(music_track.name)))
+        self.log.logMsg('debug', "Final file path: %s" % (final_file_path), self.PRINT_DEBUG)
         return final_file_path
     
     
@@ -180,7 +179,14 @@ class MP3MusicSorter(object):
         '''
         Remove chars that could break a DB query.
         '''
-        return re.sub(r'''['<>;{}~*&#|]''', '', self._removeNonAscii(str(str_in)))
+        return re.sub(r'''['<>;{}~*&#|/]''', '', str_in)
+    
+    
+    def _subBadChars(self, str_in):
+        '''
+        Remove chars that could break a DB query.
+        '''
+        return re.sub(r'''['<>;{}~*&#|/]''', '_', str_in)
     
         
     def iterateThroughFolder(self, directory_to_scan, action="duplicates"):

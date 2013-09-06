@@ -1,8 +1,9 @@
+#!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
 '''
 Created on 1 Sep 2013
-
-@author: jchapman
 '''
+
 import logging
 
 class MP3Logger:

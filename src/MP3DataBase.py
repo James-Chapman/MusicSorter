@@ -1,8 +1,9 @@
+#!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
 '''
 Created on 3 Sep 2013
-
-@author: jchapman
 '''
+
 from MusicTrack import MusicTrack
 import re
 import sqlite3
@@ -54,7 +55,7 @@ class MP3DataBase(object):
         filename = self._stripBadChars(music_track.filename)
         bitrate = music_track.bitrate
         cursor = self.conn.cursor()
-        cursor.execute("INSERT INTO music VALUES ('%s','%s','%s','%s', '%s')" % (artist, album, track, bitrate, filename))
+        cursor.execute("INSERT INTO music VALUES (?, ?, ?, ?, ?)", (artist, album, track, bitrate, filename))
         self.conn.commit()
 
        

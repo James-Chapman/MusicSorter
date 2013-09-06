@@ -2,7 +2,6 @@
 # encoding: utf-8
 '''
 Does what it says on the tin...
-@author:     jchapman
 '''
 
 from MP3MusicSorter import MP3MusicSorter

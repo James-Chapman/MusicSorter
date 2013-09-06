@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 1 Sep 2013
-
-@author: jchapman
 '''
 
 class MusicTrack(object):
@@ -30,7 +28,14 @@ class MusicTrack(object):
         self.music_brainz_album_type = "unknown"
         self.allTagData = None
         
-         
+        
+    def __str__(self):
+        '''
+        String representation of class
+        '''
+        return self.filename
+        
+        
     def printMusicTrackData(self):
         '''
         Print all data we have for a track
