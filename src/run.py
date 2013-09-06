@@ -12,7 +12,7 @@ import ConfigParser
 
 this_script = os.path.basename(__file__)
 name = "MP3MusicSorter"
-help_message = '''
+license_message = '''
 
   Created by jchapman on 1 September 2013.
   
@@ -21,6 +21,9 @@ help_message = '''
   
   Distributed on an "AS IS" basis without warranties
   or conditions of any kind, either express or implied.
+
+'''
+help_message = '''
 
 USAGE
 
@@ -49,6 +52,7 @@ MP3MusicSorter_logger = MP3Logger(name, "debug", "%s.log" % (name))
 
 
 if __name__ == '__main__':
+    print(license_message)
     arg = "None"
     sorter = MP3MusicSorter(myos, sorted_mp3_dir, logger=MP3MusicSorter_logger)
     try:
