@@ -1,6 +1,12 @@
 MusicSorter
 ===========
 
+For usage see README.txt in src directory.
+
+
+About
+=====
+
 I have a lot of duplicate MP3s and want to delete the lower quality file.
 This was written to rename and restructure all my files in a way that
 would make it easy to spot duplicates and then delete the lower quality
