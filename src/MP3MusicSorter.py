@@ -179,14 +179,14 @@ class MP3MusicSorter(object):
         '''
         Remove chars that could break a DB query.
         '''
-        return re.sub(r'''['<>;{}~*&#|/]''', '', str_in)
+        return re.sub(r'''["'<>?:;{}~*&#|/\\]''', '', str_in)
     
     
     def _subBadChars(self, str_in):
         '''
         Remove chars that could break a DB query.
         '''
-        return re.sub(r'''['<>;{}~*&#|/]''', '_', str_in)
+        return re.sub(r'''["'<>?:;{}~*&#|/\\]''', '_', str_in)
     
     
     def _setupDatabase(self):
@@ -208,6 +208,7 @@ class MP3MusicSorter(object):
             self._setupDatabase()
         for root, dirnames, filenames in os.walk(self.music_dir_to_scan):
             for filename in fnmatch.filter(filenames, '*.mp3'):
+                sys.stdout.write('.')
                 music_track = self.extractID3InfoFromFile(os.path.join(root, filename))
                 self.addComment(music_track.filename)
                 if action == "upgradeTags":
