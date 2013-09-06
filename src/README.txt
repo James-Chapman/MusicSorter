@@ -21,8 +21,9 @@ CHANGELOG
 
 6 September 2013
 
-  * Massive database improvements
+  * Massive database improvements.
   * A lot of Windows file system related bug fixes.
+  * Activity indicator during the sort_and_rename process. 
 
 
 4 September 2013
@@ -36,6 +37,15 @@ CHANGELOG
   * Initial project creation.
 
 
+
+
+KNOWN ISSUES
+============
+
+DEBUG logging is currently a bit of an issue and causing the whole thing to slow down a bit
+not to mention leaving behind a f**k off big log file.
+
+This is an issue I plan to address in the near future.
 
 
 
