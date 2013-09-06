@@ -179,7 +179,7 @@ class MP3MusicSorter(object):
         '''
         Remove chars that could break a DB query.
         '''
-        return re.sub(r'''["'<>?:;{}~*&#|/\\]''', '', str_in)
+        return re.sub(r'''["'.<>?:;{}~*&#|/\\]''', '', str_in)
     
     
     def _subBadChars(self, str_in):
