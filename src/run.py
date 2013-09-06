@@ -25,11 +25,11 @@ help_message = '''
 USAGE
 
   %s show_duplicates  - Will print out a list of Artists and Track Titles 
-                        that have more than 1 file associated with it.
+                            that have more than 1 file associated with it.
   %s pretend          - Won't actually do anything, just a pretend run.
   %s sort_and_rename  - This will cause files to be sorted and renamed.
   %s update_tags      - Try and upgrade existing tags to ID3 version 2.4
-                        (not sure that this actually does anything!)
+                            (not sure that this actually does anything!)
   
 ''' % (this_script, this_script, this_script, this_script)
 

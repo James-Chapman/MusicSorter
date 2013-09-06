@@ -188,6 +188,16 @@ class MP3MusicSorter(object):
         '''
         return re.sub(r'''['<>;{}~*&#|/]''', '_', str_in)
     
+    
+    def _setupDatabase(self):
+        '''
+        Set up the database
+        '''
+        self.db = MP3DataBase()
+        self.db.createNewArtistTable()
+        self.db.createNewAlbumTable()
+        self.db.createNewTrackTable()
+    
         
     def iterateThroughFolder(self, directory_to_scan, action="duplicates"):
         '''
@@ -195,8 +205,7 @@ class MP3MusicSorter(object):
         '''
         self.music_dir_to_scan = directory_to_scan
         if action == "getDuplicates":
-            self.db = MP3DataBase()
-            self.db.createNewMusicTable()
+            self._setupDatabase()
         for root, dirnames, filenames in os.walk(self.music_dir_to_scan):
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 music_track = self.extractID3InfoFromFile(os.path.join(root, filename))
@@ -220,10 +229,10 @@ class MP3MusicSorter(object):
                     self.log.logMsg('error', "Skipping file because key info is missing: %s" % (music_track.filename))
         if action == "getDuplicates":
             db_data = self.db.getDuplicates()
+            self.db.getDuplicates()
             for row in db_data:
-                if int(row[4]) > 1:
-                    print(str(row[4]).ljust(6) + str(row[0]).ljust(40) + str(row[2]).ljust(40))
-            self.db.dropMusicTable()
+                print("%s     %s   %s" % (row[5], row[0].ljust(30), row[3].ljust(60)))
+            self.db.dropAllTables()
         
 
     def extractID3InfoFromFile(self, musicfile):
