@@ -41,7 +41,7 @@ class MP3MusicSorter(object):
         Extract bitrate and length from audio file.
         '''
         bitrate = mp3_audio_file.info.bitrate / 1000
-        self.log.logMsg('debug', "Bitrate: %s" % (bitrate), self.PRINT_DEBUG)
+        #self.log.logMsg('debug', "Bitrate: %s" % (bitrate), self.PRINT_DEBUG)
         return bitrate
     
     
@@ -50,7 +50,7 @@ class MP3MusicSorter(object):
         Extract bitrate and length from audio file.
         '''
         length = mp3_audio_file.info.length
-        self.log.logMsg('debug', "Length: %s" % (length), self.PRINT_DEBUG)
+        #self.log.logMsg('debug', "Length: %s" % (length), self.PRINT_DEBUG)
         return length
 
     
@@ -61,7 +61,7 @@ class MP3MusicSorter(object):
         for tag in tags:
             retval = mp3_audio_file.tags.getall(tag)
             if retval:
-                self.log.logMsg('debug', "Tag found: %s - %s" % (tag, retval[0]), self.PRINT_DEBUG)
+                #self.log.logMsg('debug', "Tag found: %s - %s" % (tag, retval[0]), self.PRINT_DEBUG)
                 return retval[0]
         #print(mp3_audio_file.tags.getall("TXXX"))
         return None
@@ -72,7 +72,7 @@ class MP3MusicSorter(object):
         Extract Artist from tags.
         '''
         retval = self._extractTagDataFromFile(["TPE2","TPE1","TP2","TP1"], mp3_audio_file)
-        self.log.logMsg('debug', "Artist: %s" % (retval), self.PRINT_DEBUG)
+        #self.log.logMsg('debug', "Artist: %s" % (retval), self.PRINT_DEBUG)
         return retval
         
         
@@ -81,7 +81,7 @@ class MP3MusicSorter(object):
         Extract Album Name from tags.
         '''
         retval = self._extractTagDataFromFile(["TALB","TAL","album"], mp3_audio_file)
-        self.log.logMsg('debug', "Album: %s" % (retval), self.PRINT_DEBUG)
+        #self.log.logMsg('debug', "Album: %s" % (retval), self.PRINT_DEBUG)
         return retval
 
         
@@ -90,7 +90,7 @@ class MP3MusicSorter(object):
         Extract Track Title from tags.
         '''
         retval = self._extractTagDataFromFile(["TIT2","TT2","title"], mp3_audio_file)
-        self.log.logMsg('debug', "Title: %s" % (retval), self.PRINT_DEBUG)
+        #self.log.logMsg('debug', "Title: %s" % (retval), self.PRINT_DEBUG)
         return retval
         
         
@@ -102,7 +102,7 @@ class MP3MusicSorter(object):
         if not retval:
             retval = "00/00"
         retval = str(retval).split('/')[0].zfill(2)
-        self.log.logMsg('debug', "Track: %s" % (retval), self.PRINT_DEBUG)
+        #self.log.logMsg('debug', "Track: %s" % (retval), self.PRINT_DEBUG)
         return retval
         
         
@@ -114,7 +114,7 @@ class MP3MusicSorter(object):
         if not retval:
             retval = "0000-00-00"
         retval = str(retval).split('-')[0]
-        self.log.logMsg('debug', "Year: %s" % (retval), self.PRINT_DEBUG)
+        #self.log.logMsg('debug', "Year: %s" % (retval), self.PRINT_DEBUG)
         return retval
             
     
@@ -125,7 +125,7 @@ class MP3MusicSorter(object):
         retval = self._extractTagDataFromFile(["TXXX:MusicBrainz Album Type"], mp3_audio_file)
         if not retval:
             retval = "unknown"
-        self.log.logMsg('debug', "MusicBrainz Album Type: %s" % (retval), self.PRINT_DEBUG)
+        #self.log.logMsg('debug', "MusicBrainz Album Type: %s" % (retval), self.PRINT_DEBUG)
         return retval
     
     
@@ -208,9 +208,9 @@ class MP3MusicSorter(object):
             self._setupDatabase()
         for root, dirnames, filenames in os.walk(self.music_dir_to_scan):
             for filename in fnmatch.filter(filenames, '*.mp3'):
+                self.log.logMsg('debug', "Found MP3 file: %s%s%s" % (root, self.sep, filename), self.PRINT_DEBUG)
                 sys.stdout.write('.')
                 music_track = self.extractID3InfoFromFile(os.path.join(root, filename))
-                self.addComment(music_track.filename)
                 if action == "upgradeTags":
                     self.updateTagsToV24(music_track.filename)
                     sys.exit()
@@ -219,8 +219,7 @@ class MP3MusicSorter(object):
                     if action == "pretend":
                         self.printMove(music_track)
                     elif action == "restructure":
-                        #self.updateTagsToV24(music_track)
-                        #self.addComment(music_track)
+                        self.addComment(music_track.filename)
                         self.moveFile(music_track)
                     elif action == "getDuplicates":
                         self.db.insertTrack(music_track)
