@@ -51,20 +51,20 @@ CHANGELOG
 
 6 September 2013
 
-  [x] Massive database improvements.
-  [x] A lot of Windows file system related bug fixes.
-  [x] Activity indicator during the sort_and_rename process. 
+  * Massive database improvements.
+  * A lot of Windows file system related bug fixes.
+  * Activity indicator during the sort_and_rename process. 
 
 
 4 September 2013
 
-  [x] Added SQLite DB queries to show tracks that have more than 1 file associated with it.
-  [x] Added MP3Exception class.
+  * Added SQLite DB queries to show tracks that have more than 1 file associated with it.
+  * Added MP3Exception class.
 
 
 1 September 2013
 
-  [x] Initial project creation.
+  * Initial project creation.
 
 
 
@@ -72,7 +72,7 @@ CHANGELOG
 KNOWN ISSUES
 ------------
 
-  [ ]
+  * None
 
 
 
@@ -93,7 +93,7 @@ To do that, perform the following steps:
 
 1.) Download ez_setup.py from https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
 2.) Open a command prompt and run
-    'python ez_setup.py'
+    '''python ez_setup.py'''
     
 "pip" should now be installed in C:\Python27\Scripts
 Run 'pip install ConfigParser'
