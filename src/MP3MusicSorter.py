@@ -71,7 +71,10 @@ class MP3MusicSorter(object):
         '''
         Extract Artist from tags.
         '''
-        retval = self._extractTagDataFromFile(["TPE2","TPE1","TP2","TP1","artist"], mp3_audio_file)
+        try:
+            retval = self._extractTagDataFromFile(["TPE2","TPE1","TP2","TP1","artist"], mp3_audio_file)
+        except:
+            raise MP3Exception("No artist tag found :(")
         #self.log.logMsg('debug', "Artist: %s" % (retval), self.PRINT_DEBUG)
         return retval
         
