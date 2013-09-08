@@ -71,10 +71,7 @@ class MP3MusicSorter(object):
         '''
         Extract Artist from tags.
         '''
-        try:
-            retval = self._extractTagDataFromFile(["TPE2","TPE1","TP2","TP1","artist"], mp3_audio_file)
-        except:
-            raise MP3Exception("No artist tag found :(")
+        retval = self._extractTagDataFromFile(["TPE2","TPE1","TP2","TP1","artist"], mp3_audio_file)
         #self.log.logMsg('debug', "Artist: %s" % (retval), self.PRINT_DEBUG)
         return retval
         
@@ -213,7 +210,10 @@ class MP3MusicSorter(object):
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 self.log.logMsg('debug', "Found MP3 file: %s%s%s" % (root, self.sep, filename), self.PRINT_DEBUG)
                 sys.stdout.write('.')
-                music_track = self.extractID3InfoFromFile(os.path.join(root, filename))
+                try:
+                    music_track = self.extractID3InfoFromFile(os.path.join(root, filename))
+                except:
+                    self.log.logMsg('warning', "Unable to extract tag data from %s" % (music_track.filename), True)
                 if action == "upgradeTags":
                     self.updateTagsToV24(music_track.filename)
                     sys.exit()
