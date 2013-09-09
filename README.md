@@ -12,9 +12,8 @@ file.
 It iterates through a folder of MP3 files and moves and renames them into
 a new folder and you typically end up with something like: 
 
-new_folder/artist/album_type/(year) album/01 - 128 - song_title.mp3
-
-new_folder/artist/album_type/(year) album/01 - 320 - song_title.mp3
+  * new_folder/artist/album_type/(year) album/01 - 128 - song_title.mp3
+  * new_folder/artist/album_type/(year) album/01 - 320 - song_title.mp3
 
 You can easily see which file is the lower quality file and delete it.
 While size is also a good indicator, it isn't always a true indicator
@@ -36,14 +35,14 @@ because VBR can result in a smaller yet higher quality file.
 
 
   * Modify the config file first!
-  * Now run 'python run.py' and read the available run time parameters.
+  * Now run `python run.py` and read the available run time parameters.
 
 Everything is logged to a logfile called MP3MusicSorter.log
 
 
 
 
-## CHANGELOG
+## Changelog
 
 
 #### 6 September 2013
@@ -66,7 +65,7 @@ Everything is logged to a logfile called MP3MusicSorter.log
 
 
 
-## KNOWN ISSUES
+## Known Issues
 
 
   * None
@@ -74,7 +73,7 @@ Everything is logged to a logfile called MP3MusicSorter.log
   
   
   
-## TO COME
+## Future Features
 
   * Pattern matching for custom folder/file structures.
 
@@ -83,7 +82,7 @@ Everything is logged to a logfile called MP3MusicSorter.log
 
 
 
-## HAVING PROBLEMS?
+## Having Problems?
 
 
 
@@ -97,11 +96,10 @@ To do that, perform the following steps:
 
   1.  Download ez_setup.py from https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
   2.  Open a command prompt and run
-          python ez_setup.py
+      `python ez_setup.py`
     
 "pip" should now be installed in C:\Python27\Scripts
-Run 
-    pip install ConfigParser
+Run `pip install ConfigParser`
 
 The same with mutagen if it fails.
 
